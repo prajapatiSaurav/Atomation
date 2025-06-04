@@ -1,0 +1,1475 @@
+{
+  "name": "Automated AI linkedin DM sytems",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "LinkedIn Lead Outreach Trigger",
+        "formDescription": "Insert an audience for your LinkedIn Outreach Campaign here.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Paste Linkedin Sales Navigator Search Url here",
+              "fieldType": "textarea",
+              "placeholder": "https://www.linkedin.com/sales/search/people?query=",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "LInkedin Sales Navigator Session Cookies",
+              "placeholder": "AQEFAREBAAAAABVnZngAAAGWZ"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -420,
+        -40
+      ],
+      "id": "a9b43b03-7af0-4fad-a232-d5662d069c19",
+      "name": "On form submission",
+      "webhookId": "ecb5116a-1434-45b5-8f38-31393735a1b8"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        320
+      ],
+      "id": "2807cb4c-0a89-4147-9105-36a5b135c37f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE",
+          "mode": "list",
+          "cachedResultName": "New Connection Apollo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1891370023,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE/edit#gid=1891370023"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "first_name": "={{ $('Limit').item.json.first_name }}",
+            "last_name": "={{ $('Limit').item.json.last_name }}",
+            "email_status": "={{ $('Limit').item.json.email_status }}",
+            "id": "={{ $('Limit').item.json.organization.id }}",
+            "name": "={{ $('Limit').item.json.name }}",
+            "linkedin_url": "={{ $('Limit').item.json.linkedin_url }}",
+            "photo_url": "={{ $('Limit').item.json.photo_url }}",
+            "icebreaker": "={{ $json.message.content.icebreaker }}",
+            "Connection_type": "New_Connection"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Connection_type",
+              "displayName": "Connection_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email_status",
+              "displayName": "email_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "photo_url",
+              "displayName": "photo_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2140,
+        320
+      ],
+      "id": "0b477592-08ad-4670-951f-98199e222e71",
+      "name": "Add to Google Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WyzbOVX6iniCxkNW",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.phantombuster.com/api/v2/agents/launch",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Phantombuster-Key",
+              "value": "QhSTol3FkGEtfknhmw7GeU4zO8lKvvzGlRBRQMqEvUI"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"id\": \"2334027507436539\",\n  \"argument\": {\n    \"requestsTime\": \"Randomly throughout the day and week\",\n\t\"leadsSourceUrl\": \"https://www.linkedin.com/in/thenilakshidas/\",\n\t\"sessionCookie\": \"AQEFAREBAAAAABVnZngAAAGWZ-j96wAAAZa1XYAjVgAAtHVybjpsaTplbnRlcnByaXNlQXV0aFRva2VuOmVKeGpaQUFDeWR3clRDQmEydko1R29oVzJMdDJFeU9JVVg0Ny9qT1lFZTAxK3pFREl3REM3QW9GXnVybjpsaTplbnRlcnByaXNlUHJvZmlsZToodXJuOmxpOmVudGVycHJpc2VBY2NvdW50OjQyNjYyODA5OCw0NTY3Nzk2MjIpXnVybjpsaTptZW1iZXI6MTQzODE0NzExMpcCimOv7wxOm46_tIaBnXJIVPv4ca7OXifvclHkGvEZXkzXVWWHrCYH2EAGBYqZnx5-hGv6GgWiLgXSLO6UcmBR0tK66ZkBA3kfG5jiNUHqDziNHuhKuOsaIEW73rti7pXyvsGgHOj3us8xWYXtP8Z1nzrUk7U6LD4xcLvCiDDVd77r37ErXBKlIj_Msdf37_Pi0ek\",\n\t\"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36\",\n\t\"customizeInvite\": true,\n\t\"invitationMessage\": \"Hey #firstName# Lets Connect\",\n\t\"firstFollowUp\": false,\n\t\"maxNumberOfConnectionsPerDay\": 1\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2580,
+        320
+      ],
+      "id": "c158e991-5b59-459c-b82a-2ce48d0a3a7b",
+      "name": "Trigger PhantomBuster Agent"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        940,
+        -60
+      ],
+      "id": "29724f49-c30e-483e-a2dc-c770f764c6b4",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writing assistant.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to take as input a bunch of LinkedIn profile information of a user, and then generate a very short, very punchy icebreaker that I can use as a variable in my connection request.\n\nReturn your results in this format:\n\n{\"icebreaker\":\"Icebreaker goes here\"}\n\nIn order to ensure icebreakers are punchy and high-quality, make them follow this template:\n\nHey {{name}}, loved seeing {{thingAboutThem}}. I'm also into {{plausibleTieIn}}, thought I'd connect.\n\nFor {{thingAboutThem}} and {{plausibleTieIn}}, never use the exact information provided in a LinkedIn field. Instead, always paraphrase. This makes it seem human written, instead of just an automated message. Also, make it super short. Don't say stuff like \"passionate about turning vision into reality\" or anything like that—be extremely laconic and spartan."
+            },
+            {
+              "content": "={\"linkedInFields\":\"Danielle Morgan, Fort Lauderdale, Founder & CEO at DM Creative Agency, previous experience: Regional Sales Director at Out East Eyewear, Account Director at Radancy\"}"
+            },
+            {
+              "content": "{\n  \"icebreaker\": \"Hey Danielle, loved seeing your creative agency journey. I'm also building brands, thought I'd connect.\"\n}",
+              "role": "assistant"
+            },
+            {
+              "content": "={\"linkedInFields\":\"{{ $json.first_name }} {{ $json.last_name }}, {{ $json.city }}, {{ $json.title }} at {{ $json.employment_history[0].organization_name }}, previous experience: {{ $json.employment_history[1].title }} at {{ $json.employment_history[1].organization_name }}, {{ $json.employment_history[2].title }} at {{ $json.employment_history[2].organization_name }}\"}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1720,
+        320
+      ],
+      "id": "836c8ef7-4e05-4fb9-a6af-b067910c4828",
+      "name": "Personalize Outreach",
+      "credentials": {
+        "openAiApi": {
+          "id": "eoi6ZDnb3KZZntJK",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0e98f728-2eb5-4ffe-aaa6-d8b2ab95402e",
+              "leftValue": "={{ $json.profileUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        -40
+      ],
+      "id": "b30368d3-af1e-44c4-9e69-e91fcc94fd72",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writing assistant.",
+              "role": "system"
+            },
+            {
+              "content": "=You are a LinkedIn InMail outreach agent for Eeco Woodies — a premium brand crafting sustainable, eco-friendly bamboo furniture and home decor.\n\nYour task is to write warm, thoughtful, personalized InMail messages based on a user's LinkedIn profile. The tone should be friendly, creative, and add emotional value by introducing how Eeco Woodies' products can beautify the recipient's space, support their lifestyle, or complement their creative/business energy.\n\nMessage Writing Instructions:\n\n1. Analyze the LinkedIn profile fields provided (designation, company, about, location, interests, etc.). Use *only what’s available*, and *never copy directly*. Paraphrase and infer insights to make the intro feel human and personal.\n2. Start by appreciating something about their journey, role, company, or interests in a warm and meaningful way.\n3. If there's a clear similarity between their work, values, or location and Eeco Woodies — for example:\n   - They're from or based in **Uttar Pradesh, Delhi NCR, or nearby North India** (Eeco Woodies is based in **Ghaziabad, UP**)  \n   - They care about sustainability, aesthetics, handcrafted work, or natural living\n   — mention that and use it to segue into the brand introduction.\n4. If there’s no clear similarity, gently transition by saying you wanted to introduce something that could *add beauty to their workspace* or *bring something thoughtful to their home*.\n5. Introduce Eeco Woodies briefly as a sustainable brand based in **Ghaziabad, Uttar Pradesh**, making handcrafted bamboo furniture and decor that brings nature and design together.\n6. Recommend 2–3 products based on their role:\n   - If Founder, CEO, or Purchase Manager → suggest office/workspace items.\n   - If general audience → suggest home decor items.\n   - If dealer/retail/distributor → mention that bulk/wholesale partnerships are welcomed.\n7. End by softly inviting them to explore more if interested, using this line:  \n   *“If this resonates, you can explore more beautiful pieces tailored to your vibe here: https://www.ecowoodies.in/”*\n8. Close with a grateful, polite note like:  \n   *“Thanks for giving this a moment — truly appreciate it.”*  \n   Then sign off with name and role.\n9.Make sure message is short and sweet of 150 words\n\nAlways include this product list (with pricing):\n\nOffice Products (for Founders / CEOs / Purchase Managers):\n- Bamboo Office Table Set – ₹6,499: Eco-luxe desk setup for modern workspaces.\n- Ergonomic Bamboo Chair – ₹4,999: Stylish, comfortable, and planet-friendly.\n- Bamboo Desktop Organizer – ₹1,299: Declutter your desk with natural charm.\n- Multi-Tier File Rack – ₹2,299: Smart bamboo storage for paperwork.\n- Wall-Mounted Bamboo Shelves – ₹1,999: Display essentials with earthy elegance.\n\nHome Decor Products (for everyone else):\n- Bamboo Lounge Chair – ₹3,999: Relaxation meets sustainable design.\n- Decorative Bamboo Wall Art – ₹1,299: A warm, rustic vibe for your walls.\n- Handwoven Bamboo Basket Set – ₹1,199: Functional beauty for storage or decor.\n- Bamboo Planters – ₹999: Bring greenery indoors with a natural touch.\n- Baby Photoshoot Stand (Bamboo) – ₹2,499: Ideal for parents and photographers.\n\nExample Output Structure:\n\nHi name,  \nThoughtful opening that reflects their journey, interests, or company vibe.\n\nIf similarity with Eeco Woodies through work, values, or location → mention it and segue into the brand intro \nElse → say something like: “I wanted to introduce something that could add a bit more beauty and calm to your space or your day-to-day work.”\n\nEeco Woodies is based in Ghaziabad, Uttar Pradesh, and we create sustainable bamboo furniture and decor — all handcrafted to bring a natural, earthy touch to modern spaces.\n\nIf Founder / CEO / Purchase Manager → suggest 2–3 office pieces\nIf general audience → suggest 2–3 home decor items  \nIf dealer/distributor → also say: “And yes, we welcome bulk orders and dealer partnerships as well.”\n\nIf this resonates, you can explore more beautiful pieces tailored to your vibe here: https://www.ecowoodies.in/  \nThanks for giving this a moment — truly appreciate it.  \n\nWarm regards,  \nPooja Anand  \nSales Manager, Eeco Woodies\n"
+            },
+            {
+              "content": "={\n  \"linkedInFields\": {\n    \"name\": \"Regan Johnson\",\n    \"about_person\": \"null\",\n    \"address\": \"Portland, Oregon, United States\",\n    \"headline\": \"Founder / Creative Director at Furniture\",\n    \"current_title\": \"Founder / Creative Director\",\n    \"current_job_duration_years\": \"2.25\",\n    \n    \"current_company_title\": \"Brand design, Identity Systems, Type Design, Art Direction\",\n    \n    \"current_employer\": \"Furniture\",\n    \"company_1_title\": \"Founder / Creative Director\",\n    \n    \"previous_employer_1\": \"Self Employed / contract work with Instrument, Work & Co, Rapt\",\n    \"company_2_title\": \"Brand design, Identity Systems, Type Design, Art Direction\",\n    \n    \"previous_employer_2\": \"Canary (canary.is)\",\n    \"company_3_title\": \"Brand Design Lead\",\n    \n    \"interests\": [\n      \"Brigham Young University\",\n      \"BYU Graphic Design BFA Alumni\",\n      \"The Cooper Union for the Advancement of Science and Art\"\n    ],\n    \n    \"skills\": [\n      \"Art Direction\",\n      \"Typography\",\n      \"Graphic Design\",\n      \"Corporate Identity\",\n      \"Logo Design\"\n    ]\n  }\n}\n"
+            },
+            {
+              "content": "={\n  \"message\": \"Hey Danielle, loved learning about your creative agency journey — it’s clear you’ve built something full of imagination and intention. I’d love to introduce something that might add even more beauty to your workspace. Eeco Woodies is based in Ghaziabad, Uttar Pradesh, and we specialize in sustainable bamboo furniture and home decor. Our pieces are handcrafted with care and designed to bring nature’s warmth and elegance to modern spaces.\\n\\nI thought some of our eco-friendly, beautiful bamboo furniture might complement your creative studio or workspace:\\n\\n• Bamboo Office Table Set – ₹6,499: Eco-luxe desk setup for modern workspaces.\\n• Ergonomic Bamboo Chair – ₹4,999: Stylish, comfortable, and planet-friendly.\\n• Bamboo Desktop Organizer – ₹1,299: Declutter your desk with natural charm.\\n\\nIf this resonates, you can explore more beautiful pieces tailored to your vibe here: https://www.ecowoodies.in/\\n\\nThanks for giving this a moment — truly appreciate it.\\n\\nWarm regards,\\nPooja Anand\\nSales Manager, Eeco Woodies\"\n}\n",
+              "role": "assistant"
+            },
+            {
+              "content": "={\n  \"linkedInFields\": {\n    \"name\": \"{{ $json.fullName }}\",\n    \"about_person\": \"{{ $json.about }}\",\n    \"address\": \"{{ $json.addressWithCountry }}\",\n    \"headline\": \"{{ $json.headline }}\",\n    \"current_title\": \"{{ $json.jobTitle }}\",\n    \"current_job_duration_years\": \"{{ $json.currentJobDurationInYrs }}\",\n    \n    \"current_company_title\": \"{{ $json.experiences[1].title }}\",\n    \n    \"current_employer\": \"{{ $('Limit').item.json.employment_history[0].organization_name }}\",\n    \"company_1_title\": \"{{ $('Limit').item.json.employment_history[0].title }}\",\n    \n    \"previous_employer_1\": \"{{ $('Limit').item.json.employment_history[1].organization_name }}\",\n    \"company_2_title\": \"{{ $('Limit').item.json.employment_history[1].title }}\",\n    \n    \"previous_employer_2\": \"{{ $('Limit').item.json.employment_history[2].organization_name }}\",\n    \"company_3_title\": \"{{ $('Limit').item.json.employment_history[2].title }}\",\n    \n    \"interests\": [\n      \"{{ $json.interests[0].section_components[0].titleV2 }}\",\n      \"{{ $json.interests[1].section_components[0].titleV2 }}\",\n      \"{{ $json.interests[2].section_components[1].titleV2 }}\"\n    ],\n    \n    \"skills\": [\n      \"{{ $json.skills[0].title }}\",\n      \"{{ $json.skills[1].title }}\",\n      \"{{ $json.skills[2].title }}\",\n      \"{{ $json.skills[3].title }}\",\n      \"{{ $json.skills[4].title }}\"\n    ]\n  }\n}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1720,
+        -320
+      ],
+      "id": "40729a49-e423-46d3-ba1a-2d68c0bd8f1e",
+      "name": "Personalize Outreach2",
+      "credentials": {
+        "openAiApi": {
+          "id": "eoi6ZDnb3KZZntJK",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        -320
+      ],
+      "id": "4db62cd9-ae95-455d-95b9-9e1dc75e02f7",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE",
+          "mode": "list",
+          "cachedResultName": "New Connection Apollo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "first_name": "={{ $('Limit').item.json.first_name }}",
+            "last_name": "={{ $('Limit').item.json.last_name }}",
+            "email_status": "={{ $('Limit').item.json.email_status }}",
+            "id": "={{ $('Limit').item.json.organization.id }}",
+            "name": "={{ $('Limit').item.json.name }}",
+            "linkedin_url": "={{ $('Limit').item.json.linkedin_url }}",
+            "photo_url": "={{ $('Limit').item.json.photo_url }}",
+            "icebreaker": "={{ $json.message.content.message }}",
+            "Connection_type": "Inmail"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Connection_type",
+              "displayName": "Connection_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email_status",
+              "displayName": "email_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "photo_url",
+              "displayName": "photo_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2140,
+        -320
+      ],
+      "id": "79dbe6f0-8e12-4fa7-9420-4a555468917c",
+      "name": "Add to Google Sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WyzbOVX6iniCxkNW",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.phantombuster.com/api/v2/agents/launch",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Phantombuster-Key",
+              "value": "EzZobn71pugKCcXeLxo3xnvHPmgOjQx5lVCLdBJaDV8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"id\": \"6397809305170387\",\n  \"argument\": {\n    \"message\": \"Hello\",\n    \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36\",\n    \"spreadsheetUrl\": \"https://www.linkedin.com/in/thenilakshidas/\",\n    \"numberOfProfilesPerLaunch\": 1,\n    \"spreadsheetUrlExclusionList\": [],\n    \"sessionCookie\": \"AQEFAREBAAAAABVnZngAAAGWZ-j96wAAAZa1XYAjVgAAtHVybjpsaTplbnRlcnByaXNlQXV0aFRva2VuOmVKeGpaQUFDeWR3clRDQmEydko1R29oVzJMdDJFeU9JVVg0Ny9qT1lFZTAxK3pFREl3REM3QW9GXnVybjpsaTplbnRlcnByaXNlUHJvZmlsZToodXJuOmxpOmVudGVycHJpc2VBY2NvdW50OjQyNjYyODA5OCw0NTY3Nzk2MjIpXnVybjpsaTptZW1iZXI6MTQzODE0NzExMpcCimOv7wxOm46_tIaBnXJIVPv4ca7OXifvclHkGvEZXkzXVWWHrCYH2EAGBYqZnx5-hGv6GgWiLgXSLO6UcmBR0tK66ZkBA3kfG5jiNUHqDziNHuhKuOsaIEW73rti7pXyvsGgHOj3us8xWYXtP8Z1nzrUk7U6LD4xcLvCiDDVd77r37ErXBKlIj_Msdf37_Pi0ek\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2780,
+        -320
+      ],
+      "id": "107b0a26-e6ce-44d0-9be1-6ead81b03d51",
+      "name": "Trigger PhantomBuster Agent1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writing assistant.",
+              "role": "system"
+            },
+            {
+              "content": "=You are a LinkedIn **InMail message agent** for **Eeco Woodies** — a premium brand based in **Ghaziabad, Uttar Pradesh**, crafting eco-friendly, sustainable **bamboo furniture and home decor**.\n\nYour task is to write **warm, thoughtful, and personalized** messages for people who are **already in your LinkedIn connections**. The tone should be **friendly, conversational, and human** — like reaching out to someone you admire or think you can add value to.\n\n### Instructions:\n\n1. **Analyze the user's LinkedIn profile info** (about, designation, company, interests, location, etc.). Use **only what’s available** — and **never copy fields directly**. Paraphrase and infer genuine insights.\n2. **Start by appreciating** something about their journey, role, company, or interests — be specific, warm, and authentic.\n3. **Since they’re already a connection**, begin with a warm nudge like:  \n   _“It’s lovely being connected here!”_  \n   Then flow into appreciation and segue into the message.\n4. If there’s **alignment or similarity** — like:\n   - Their work involves **creativity, aesthetics, sustainability, handcrafted goods, or design**  \n   - They're based in **Uttar Pradesh, Delhi NCR, or North India** (same as Eeco Woodies)\n   — mention that to build a natural bridge.\n5. If no clear similarity, gently say something like:  \n   _“I wanted to share something that might add a little more beauty or calm to your workspace or home.”_\n6. **Introduce Eeco Woodies**:\n   > Eeco Woodies is a sustainable brand based in Ghaziabad, Uttar Pradesh, creating handcrafted bamboo furniture and décor that brings nature’s warmth to modern living.\n7. Based on their **role**, recommend products:\n   - If **Founder, CEO, or Purchase Manager** → suggest **office/workspace items**.\n   - If general professional/individual → suggest **home decor items**.\n   - If profile indicates **dealer/distributor/retailer** → also say:  \n     _“And yes, we welcome bulk orders and dealer partnerships too.”_\n8. **Always include this curated product list**:\n\n**Office Products** (for Founders / CEOs / Purchase Managers):\n- Bamboo Office Table Set – ₹6,499: Eco-luxe desk setup for modern workspaces.  \n- Ergonomic Bamboo Chair – ₹4,999: Stylish, comfortable, and planet-friendly.  \n- Bamboo Desktop Organizer – ₹1,299: Declutter your desk with natural charm.  \n- Multi-Tier File Rack – ₹2,299: Smart bamboo storage for paperwork.  \n- Wall-Mounted Bamboo Shelves – ₹1,999: Display essentials with earthy elegance.\n\n**Home Decor Products** (for everyone else):\n- Bamboo Lounge Chair – ₹3,999: Relaxation meets sustainable design.  \n- Decorative Bamboo Wall Art – ₹1,299: A warm, rustic vibe for your walls.  \n- Handwoven Bamboo Basket Set – ₹1,199: Functional beauty for storage or decor.  \n- Bamboo Planters – ₹999: Bring greenery indoors with a natural touch.  \n- Baby Photoshoot Stand (Bamboo) – ₹2,499: Ideal for parents and photographers.\n\n9. End the message by inviting them to explore more:  \n   _“If this resonates, you can explore more beautiful pieces tailored to your vibe here: https://www.ecowoodies.in/”_\n10. Finish with a polite, grateful note:  \n   _“Thanks for giving this a moment — truly appreciate it.”_  \n   Then sign off:  \n   **Warm regards,  \n   Pooja Anand  \n   Sales Manager, Eeco Woodies**\n\n### Important Notes:\n- Keep the message around **150 words**, short and sweet.\n- Make the message feel **genuine, human, and creatively tailored**.\n- Avoid robotic phrasing or overused business clichés.\n"
+            },
+            {
+              "content": "={\n  \"linkedInFields\": {\n    \"name\": \"Regan Johnson\",\n    \"about_person\": \"null\",\n    \"address\": \"Portland, Oregon, United States\",\n    \"headline\": \"Founder / Creative Director at Furniture\",\n    \"current_title\": \"Founder / Creative Director\",\n    \"current_job_duration_years\": \"2.25\",\n    \n    \"current_company_title\": \"Brand design, Identity Systems, Type Design, Art Direction\",\n    \n    \"current_employer\": \"Furniture\",\n    \"company_1_title\": \"Founder / Creative Director\",\n    \n    \"previous_employer_1\": \"Self Employed / contract work with Instrument, Work & Co, Rapt\",\n    \"company_2_title\": \"Brand design, Identity Systems, Type Design, Art Direction\",\n    \n    \"previous_employer_2\": \"Canary (canary.is)\",\n    \"company_3_title\": \"Brand Design Lead\",\n    \n    \"interests\": [\n      \"Brigham Young University\",\n      \"BYU Graphic Design BFA Alumni\",\n      \"The Cooper Union for the Advancement of Science and Art\"\n    ],\n    \n    \"skills\": [\n      \"Art Direction\",\n      \"Typography\",\n      \"Graphic Design\",\n      \"Corporate Identity\",\n      \"Logo Design\"\n    ]\n  }\n}\n"
+            },
+            {
+              "content": "={\n  \"message\": \"Hi Danielle,\\n\\nIt’s lovely being connected here! I’ve been really inspired by your creative agency journey — the way you’ve brought vision and artistry into branding is genuinely uplifting.\\n\\nI thought I’d share something that might add a bit more beauty and calm to your workspace. I’m part of Eeco Woodies, a sustainable brand based in Ghaziabad, Uttar Pradesh. We craft eco-friendly bamboo furniture and décor — all handcrafted to bring nature’s warmth into modern spaces.\\n\\nYou might love these for your studio:\\n• Bamboo Office Table Set – ₹6,499: Eco-luxe desk setup for modern workspaces.\\n• Ergonomic Bamboo Chair – ₹4,999: Stylish, comfortable, and planet-friendly.\\n• Bamboo Desktop Organizer – ₹1,299: Declutter your desk with natural charm.\\n\\nIf this resonates, you can explore more beautiful pieces tailored to your vibe here: https://www.ecowoodies.in/\\n\\nThanks for giving this a moment — truly appreciate it.\\n\\nWarm regards,\\nPooja Anand\\nSales Manager, Eeco Woodies\"\n}\n",
+              "role": "assistant"
+            },
+            {
+              "content": "={\n  \"linkedInFields\": {\n    \"name\": \"{{ $json.fullName }}\",\n    \"about_person\": \"{{ $json.about }}\",\n    \"address\": \"{{ $json.addressWithCountry }}\",\n    \"headline\": \"{{ $json.headline }}\",\n    \"current_title\": \"{{ $json.jobTitle }}\",\n    \"current_job_duration_years\": \"{{ $json.currentJobDurationInYrs }}\",\n    \n    \"current_company_title\": \"{{ $json.experiences[1].title }}\",\n    \n    \"current_employer\": \"{{ $('Limit').item.json.employment_history[0].organization_name }}\",\n    \"company_1_title\": \"{{ $('Limit').item.json.employment_history[0].title }}\",\n    \n    \"previous_employer_1\": \"{{ $('Limit').item.json.employment_history[1].organization_name }}\",\n    \"company_2_title\": \"{{ $('Limit').item.json.employment_history[1].title }}\",\n    \n    \"previous_employer_2\": \"{{ $('Limit').item.json.employment_history[2].organization_name }}\",\n    \"company_3_title\": \"{{ $('Limit').item.json.employment_history[2].title }}\",\n    \n    \"interests\": [\n      \"{{ $json.interests[0].section_components[0].titleV2 }}\",\n      \"{{ $json.interests[1].section_components[0].titleV2 }}\",\n      \"{{ $json.interests[2].section_components[1].titleV2 }}\"\n    ],\n    \n    \"skills\": [\n      \"{{ $json.skills[0].title }}\",\n      \"{{ $json.skills[1].title }}\",\n      \"{{ $json.skills[2].title }}\",\n      \"{{ $json.skills[3].title }}\",\n      \"{{ $json.skills[4].title }}\"\n    ]\n  }\n}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1700,
+        -60
+      ],
+      "id": "898f11d3-227f-4dd6-88f6-1e4190cafd2a",
+      "name": "Personalize Outreach3",
+      "credentials": {
+        "openAiApi": {
+          "id": "eoi6ZDnb3KZZntJK",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        -60
+      ],
+      "id": "bd2de427-4ce8-4674-9364-c4710c181773",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE",
+          "mode": "list",
+          "cachedResultName": "New Connection Apollo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "first_name": "={{ $('Limit').item.json.first_name }}",
+            "last_name": "={{ $('Limit').item.json.last_name }}",
+            "email_status": "={{ $('Limit').item.json.email_status }}",
+            "id": "={{ $('Limit').item.json.organization.id }}",
+            "name": "={{ $('Limit').item.json.name }}",
+            "linkedin_url": "={{ $('Limit').item.json.linkedin_url }}",
+            "photo_url": "={{ $('Limit').item.json.photo_url }}",
+            "icebreaker": "={{ $json.message.content.message }}",
+            "Connection_type": "Old_connection"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Connection_type",
+              "displayName": "Connection_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email_status",
+              "displayName": "email_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "photo_url",
+              "displayName": "photo_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2120,
+        -60
+      ],
+      "id": "3c89ecb7-d54a-4ed2-b8a8-ae30136b284d",
+      "name": "Add to Google Sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WyzbOVX6iniCxkNW",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75d18131-abc7-46e0-a724-b5235f7ee9fd",
+              "name": "Url",
+              "value": "={{ $json[\"Paste Linkedin Sales Navigator Search Url here\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "f8e185d8-0d6e-4efe-9480-dc8f047ff6b4",
+              "name": "Session Cookies",
+              "value": "={{ $json[\"LInkedin Sales Navigator Session Cookies\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        -40
+      ],
+      "id": "8e4882e1-ebf5-4f06-9474-d95ef88270d7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "getOutput",
+        "agentId": "=1109815870932652",
+        "additionalFields": {
+          "prevContainerId": "={{ $json.containerId }}"
+        }
+      },
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -40
+      ],
+      "id": "424073f7-1c2c-47e3-8a5d-b9171d2eae8b",
+      "name": "Phantombuster",
+      "credentials": {
+        "phantombusterApi": {
+          "id": "JxVYG0JtH4syc0vj",
+          "name": "Phantombuster account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.phantombuster.com/api/v2/agents/launch",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Phantombuster-Key",
+              "value": "WSAkTrjGrscw7QHlvfjGlsCJ4vrxf9guAduRoxlNjbY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"id\": \"1109815870932652\",\n  \"argument\": {\n    \"inputType\": \"salesNavigatorSearchUrl\",\n    \"numberOfProfiles\": 2,\n    \"numberOfLinesPerLaunch\": 10,\n    \"removeDuplicateProfiles\": true,\n    \"salesNavigatorSearchUrl\": \"{{ $json.Url }}\",\n    \"numberOfResultsPerSearch\": 2,\n    \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36\",\n    \"sessionCookie\": \"{{ $json['Session Cookies'] }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -20,
+        -40
+      ],
+      "id": "66d8c36b-4f55-4d6f-a2c7-e148653ece7d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        -40
+      ],
+      "id": "4bac3463-a86f-41de-b49e-ff3409c18906",
+      "name": "Wait",
+      "webhookId": "c85b1a8b-3ee2-4413-8211-834f8d42c98a"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d4b41879-92a8-47d7-8cb5-e72e91a537f4",
+              "leftValue": "={{ $json.connectionDegree }}",
+              "rightValue": "1st",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        -60
+      ],
+      "id": "193a06f6-6b16-4bb8-b3d6-75ab64c25231",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "605752ba-ac62-4e56-bb1f-9511677a35ab",
+              "leftValue": "={{ $json.isOpenLink }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1380,
+        40
+      ],
+      "id": "17d85639-7a5e-453f-81b9-1a84aeabfdc5",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.phantombuster.com/api/v2/agents/launch",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Phantombuster-Key",
+              "value": "EzZobn71pugKCcXeLxo3xnvHPmgOjQx5lVCLdBJaDV8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"id\": \"6397809305170387\",\n  \"argument\": {\n    \"message\": \"#firstName#\",\n    \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36\",\n    \"spreadsheetUrl\": \"https://www.linkedin.com/in/thenilakshidas/\",\n    \"numberOfProfilesPerLaunch\": 1,\n    \"spreadsheetUrlExclusionList\": [],\n    \"sendInMail\": true,\n    \"sessionCookie\": \"{{ $json['Session Cookies'] }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2820,
+        -60
+      ],
+      "id": "b7aa40ea-749d-4768-9883-00bfda9541cb",
+      "name": "Trigger PhantomBuster Agent2"
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2580,
+        -320
+      ],
+      "id": "28d97573-3b98-4944-ac64-b8f1c8f142a4",
+      "name": "Wait1",
+      "webhookId": "52a4cfef-1760-4a41-9e97-fc3f3b1c3b57"
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2620,
+        -60
+      ],
+      "id": "d5c1f82b-d621-46a4-a1ba-3b3bb063dae2",
+      "name": "Wait2",
+      "webhookId": "52a4cfef-1760-4a41-9e97-fc3f3b1c3b57"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4560e2c3-ee9b-4a92-95c9-8047ca8df961",
+              "leftValue": "={{ $json.containerId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2880,
+        320
+      ],
+      "id": "9937e601-fe20-4598-ac5d-4da0505f2962",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "operation": "getOutput",
+        "agentId": "=2334027507436539",
+        "additionalFields": {
+          "prevContainerId": "={{ $json.containerId }}"
+        }
+      },
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "position": [
+        3140,
+        300
+      ],
+      "id": "7bd69e87-c2eb-48b3-926c-9765d153f28a",
+      "name": "Phantombuster1",
+      "credentials": {
+        "phantombusterApi": {
+          "id": "JxVYG0JtH4syc0vj",
+          "name": "Phantombuster account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE",
+          "mode": "list",
+          "cachedResultName": "New Connection Apollo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1891370023,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k0bIj8GfU3orMJVxJXsunR0uKyr_Hjv9iKzGKExEhTE/edit#gid=1891370023"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "={{ $json.status }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Connection_type",
+              "displayName": "Connection_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_status",
+              "displayName": "email_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "photo_url",
+              "displayName": "photo_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3320,
+        300
+      ],
+      "id": "9d7c9707-ccce-458e-bbc9-ffd8f4a78391",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WyzbOVX6iniCxkNW",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Trigger PhantomBuster Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Personalize Outreach": {
+      "main": [
+        [
+          {
+            "node": "Add to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Google Sheet1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Personalize Outreach2": {
+      "main": [
+        [
+          {
+            "node": "Add to Google Sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Personalize Outreach3": {
+      "main": [
+        [
+          {
+            "node": "Add to Google Sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Google Sheet2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Phantombuster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phantombuster": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Personalize Outreach2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Personalize Outreach3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Personalize Outreach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Trigger PhantomBuster Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Trigger PhantomBuster Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger PhantomBuster Agent": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Phantombuster1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Phantombuster1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c8ff1c54-d9a2-4b56-aaa7-61e09f7bd499",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f89cca993adecb3dc50899cab478f4ee98161fd884eb9b90a358cdc37717ac28"
+  },
+  "id": "VfuDUkfsR84KMZox",
+  "tags": []
+}

@@ -1,0 +1,1576 @@
+{
+  "name": "Auto_Email_Responder",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -20,
+        -20
+      ],
+      "id": "745df05c-c888-474a-841e-dfbd34c13e93",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get email content from the previous node\nconst emailContent = $input.first().json.snippet;  // Ensure 'body' is the correct key$input.first().json.snippet\n\n// Function to remove all HTML tags and decode HTML entities\nfunction stripHtml(html) {\n  if (!html) return \"\";  // Handle cases where content might be empty or null\n\n  return html.replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, \"\")  // Remove scripts\n             .replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, \"\")   // Remove styles\n             .replace(/<\\/?[^>]+(>|$)/g, \"\")  // Remove all HTML tags\n             .replace(/\\s+/g, \" \")  // Normalize spaces\n             .trim();  // Trim leading/trailing spaces\n}\n\n// Processed plain text content\nconst cleanedContent = stripHtml(emailContent);\n\nreturn {\n  cleanedContent\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "61a32bc3-801b-4689-bc83-9b2f59ce9fbf",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "=Analyze the following email and categorize it based on the company's handcrafted furniture business.\n\n**Email Content:**  \n{{ $json.cleanedContent }}\n\n**Output Format:**  \n- **Category:** [Ready to Send Data / More Info Needed / Not Interested / Pending]  \n- **Reason:** [Explain why this category was chosen]  \n\nFollow the company's categorization rules carefully.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an AI assistant for a company specializing in handcrafted furniture, bamboo products, and eco-friendly home décor. The company values sustainability, natural materials, and artisanal craftsmanship.\n\nYour task is to analyze incoming emails and classify them into one of four categories based on relevance.\n\n📌 Categorization Rules\n1️⃣ Ready to Send Data ✅\n  -The email clearly expresses interest in the company's products or business offerings. The sender:\n  -Wants to purchase products, request pricing, bulk order details, or shipping information.\n  -Asks about materials, sustainability, craftsmanship, or custom orders.\n  -Expresses interest in a business partnership, collaboration, or distribution.\n  -Inquires about available stock, product specifications, or wholesale options.\n  -Directly references furniture, bamboo products, or eco-friendly home décor.\n\n2️⃣ More Info Needed 🔄\n  -The email suggests potential interest but lacks enough clarity for an immediate response. The sender:\n  -Asks about customization options, lead times, or partnerships without committing to a purchase.\n  -Requests more details before deciding (e.g., wants to understand product quality, materials, or pricing structure).\n  -Shows vague interest in the company but does not explicitly mention purchasing or partnership.\n  -Uses unclear or incomplete language that suggests intent but requires follow-up.\n\n3️⃣ Not Interested ❌\n  -The email is not relevant to the company’s business. The sender:\n  -Offers unrelated services (e.g., digital marketing, software, recruitment, advertising).\n  -Sends spam, promotional content, or unsolicited sales pitches.\n  -Mentions events, sponsorships, or participation requests that are not aligned with the business.\n\nIs not a potential customer, partner, or supplier.\n\n4️⃣ Pending (Undecidable) ⏳\n  -The email may be related to the business but lacks enough information to categorize. The sender:\n  -Mentions furniture, sustainability, or bamboo without a clear question or request.\n  -Asks something business-related but is too vague to determine intent.\n  -Uses generic language (e.g., \"Tell me more about your company\") without specifics.\n  -Needs further clarification before assigning a category.  \n\nYour task:  \n- Carefully read the provided email content.  \n- Identify the sender’s intent based on the rules above.  \n- Return the most appropriate category along with a short explanation.  \n\n### **Response Format (Strict JSON Only)**  \nOnly return a JSON object in the following format **without extra text**:  \n\n```json\n{\n  \"category\": \"Ready to Send Data / More Info Needed / Not Interested / Pending\",\n  \"reasons\": [\n    \"Reason 1\",\n    \"Reason 2\"\n  ]\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        420,
+        0
+      ],
+      "id": "71c670df-4439-448a-b110-05ac921952ed",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        400,
+        220
+      ],
+      "id": "9a63c132-fbb1-45db-9661-bbd5ecbcae50",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "BISTjxbwZ2Pt7Swa",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"category\": {\n      \"type\": \"string\",\n      \"enum\": [\"Ready to Send Data\", \"More Info Needed\", \"Not Interested\", \"Pending\"]\n    },\n    \"reasons\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        220
+      ],
+      "id": "c7562d4b-86b5-4087-8465-a2a4ff40e28c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ccc6c29a-e1ae-4542-b3a1-276448647c2b",
+              "name": "output.category",
+              "value": "={{ $json.output.category }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        780,
+        0
+      ],
+      "id": "844dd4be-fb4b-4564-89e4-e5390e40edf0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Edit Fields').item.json.output.category }}",
+                    "rightValue": "Ready to Send Data",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=Ready to Send Data"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dad77551-445c-4c79-bdc9-4a9318fde985",
+                    "leftValue": "={{ $('Edit Fields').item.json.output.category }}",
+                    "rightValue": "Not Interested ",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Not Interested "
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "92aeec51-a1e8-4d5c-b16f-924a89f01cb6",
+                    "leftValue": "={{ $('Edit Fields').item.json.output.category }}",
+                    "rightValue": "Pending",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Pending"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2cd857d5-f2c7-4144-a2f6-bdde59e1fe8c",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "More Info Needed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "More Info Needed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "063cce61-8863-410f-9ea0-dd9f53407023",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following email and determine the best response based on the data available in the Supabase vector store.\n\ncontent :  {{ $json.Content }}\n\nReturn ONLY valid JSON in the exact format below. Do NOT include extra text, explanations, or formatting.\n\n**Output Format:**  \n```json\n{\n  \"data_found\": true/false,\n  \"response\": \"your response here\"\n}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Analyze the following email and determine the best response using the stored data in the Supabase vector store.\n\n**Instructions:**  \n1. Search Supabase for relevant stored responses that match the email content.\n2. If a relevant response is found, set `\"data_found\": true` and use it to generate a response.\n3. If no relevant data is found, set `\"data_found\": false` and generate a fresh response based on company context.\n\nReturn ONLY valid JSON in the exact format below. Do NOT include extra text, explanations, or formatting.\n\n**Output Format:**  \n```json\n{\n  \"data_found\": true/false,\n  \"response\": \"your response here\"\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2000,
+        -380
+      ],
+      "id": "4568b3ec-a8d4-4eae-9464-8207ba420d97",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "name": "documents",
+        "description": "=You are an AI assistant that analyzes data retrieved from a Supabase vector store to generate accurate and relevant responses. Your task is to extract the most appropriate information based on the provided data structure and return a well-structured response.  \n\n### **How the Data is Retrieved:**  \n- The data comes from a Supabase vector store, which stores structured objects.  \n- The key fields you will receive are:  \n  - **Content**: The text content that contains the user query or relevant context.  \n  - **Answer**: The predefined answer corresponding to the Content.  \n\n### **Your Task:**  \n1. **Understand the Query:** Extract the `Content` from the retrieved data and determine its intent.  \n2. **Verify the Answer Match:**  \n   - Ensure that the `Answer` field directly corresponds to the given `Content`.  \n   - If the `Answer` does not align with the `Content`, return an appropriate fallback response instead of providing incorrect information.  \n3. **Generate a Clear Response:**  \n   - Use the verified `Answer` field to formulate the response.  \n   - Do **not** generate content beyond what is provided in the `Answer`.  \n   - Ensure the response is **concise, relevant, and accurate**.  \n\n### **Response Guidelines:**  \n- **Strict Matching:** The `Answer` must directly relate to the `Content`. If no relevant answer is found, respond with:  \n  _\"I'm sorry, but I couldn't find the exact information you're looking for. Can you provide more details?\"_  \n- **No Fabrication:** Do not infer or create additional details beyond what is provided in the `Answer`.  \n- **Clarity and Professionalism:** Format the response in a well-structured and professional manner.  \n\n---\n\n### **General Data Structure:**  \n```json\n{\n  \"metadata\": {\n    \"Category\": \"<Category of the inquiry>\",\n    \"blobType\": \"text/plain\",\n    \"Content\": \"<User's question or relevant content>\",\n    \"Answer\": \"<Predefined answer corresponding to the Content it might be include the numerical value>\"\n  }\n}",
+        "topK": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        -120
+      ],
+      "id": "54a39835-1b88-4ce0-bcba-b9a20cc2256d",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "jsCode": "return[\n  {\n    \"content\": \"What is the price of your bamboo chairs?\",\n    \"metadata\": {\n      \"category\": \"Pricing Inquiry\"\n    },\n    \"answer\": \"Standard chair price is about nine to ten dollar\"\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3400,
+        -1160
+      ],
+      "id": "68dcf1fc-01ae-471a-aab7-2ddeb698cf2c",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        3740,
+        -1160
+      ],
+      "id": "7f26f33e-4887-4d2d-862f-5c4490ac511f",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "S06QrbXYjBduj05z",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 999,
+        "options": {
+          "splitCode": "markdown"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        4000,
+        -760
+      ],
+      "id": "bd12a09f-18b0-42e5-b126-74793e908b6f",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "modelName": "models/embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3580,
+        -860
+      ],
+      "id": "682b5820-de82-42ae-9945-49a9932f0e45",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "i4MLf1sSOtcEyggp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.content }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "=Content",
+                "value": "={{ $json.content }}"
+              },
+              {
+                "name": "Category",
+                "value": "={{ $json.metadata.category }}"
+              },
+              {
+                "name": "Answer",
+                "value": "={{ $json.answer }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        3880,
+        -940
+      ],
+      "id": "6214ec79-f9f0-4f5c-8908-a7955b63d5e2",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "id"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        1960,
+        100
+      ],
+      "id": "561d138d-f53c-42fb-bb20-85eb5af7311a",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "S06QrbXYjBduj05z",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1980,
+        320
+      ],
+      "id": "1dc5f399-339d-404e-86ce-fba303d184c5",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "i4MLf1sSOtcEyggp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eae5c841-f046-439f-98b8-f799797323fa",
+              "name": "Content",
+              "value": "={{ $('Code').item.json.cleanedContent }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1640,
+        -180
+      ],
+      "id": "fa95bb5b-0073-4fc5-b8a1-3d26db8fe82a",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1-distill-llama-70b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        140
+      ],
+      "id": "aa504161-d9d0-4751-bc46-5dcb41e0bde1",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "BISTjxbwZ2Pt7Swa",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n      \"data_found\": {\n        \"type\": \"boolean\"\n      },\n      \"response\": {\n        \"type\": \"string\"\n      }\n    }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        -40
+      ],
+      "id": "f6dbec72-e237-4332-b878-0d76ac337f0e",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.data_found }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Send Mail"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2646e3b4-94db-40f8-927c-8e3c92a63ff1",
+                    "leftValue": "={{ $json.output.data_found }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Generate Mail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2580,
+        -420
+      ],
+      "id": "4b8819e5-13c9-4cc7-ab10-18becab36087",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "24a74168-9092-42e5-a47f-497de546ab3a",
+              "leftValue": "={{ $json.output.data_found }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2380,
+        -380
+      ],
+      "id": "30626646-34c0-47d8-8d46-30f9153359ca",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "addLabels",
+        "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "labelIds": [
+          "Label_1090139298619174784"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1480,
+        -60
+      ],
+      "id": "b7014352-155c-4ba8-ad7e-5c334af2188f",
+      "name": "Gmail1",
+      "webhookId": "ecdaafd9-dc59-4622-a3da-84793cdda021",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "labelIds": [
+          "Label_3776115794757764671"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1460,
+        100
+      ],
+      "id": "ed0d05a3-ffbb-4091-a27f-9b66db8b5894",
+      "name": "Gmail2",
+      "webhookId": "8d8fd346-b5ed-45ee-b1f5-e05e38a12907",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "addLabels",
+        "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "labelIds": [
+          "Label_4660287755492001105"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1340,
+        -180
+      ],
+      "id": "1628a5bc-d56b-463f-8d87-c1fd47c776fe",
+      "name": "Gmail3",
+      "webhookId": "ecdaafd9-dc59-4622-a3da-84793cdda021",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2780,
+        -320
+      ],
+      "id": "5154a40d-3bcc-40a8-b6a8-8e4b77840cc0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "WsM8AUx3rZXQbaVh",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a well-structured HTML email response using the given subject and response text.\n\n### Input Details:\n- **Original Email Subject (From User):** {{ $('Gmail Trigger').item.json.Subject }}  \n- **Response Text:** {{ $json.output.response }}  \n- **Name :** {{ $('Gmail Trigger').item.json.To }}\n- **Company Name :** Eco woodies\n\n### **Your Task:**\n1. **Generate a new, appropriate email subject** that reflects the response content and makes the email engaging.  \n   - Avoid repeating the original subject verbatim.  \n   - The subject should be **concise, relevant, and professional**.  \n   - If the response is a follow-up, prefix it with `\"Re: \"` while making it more meaningful.  \n\n2. **Format the email response professionally in HTML**:\n   - Use the new subject in `<h2>` or `<h3>`.  \n   - Add a **friendly greeting** at the start and a **polite closing** at the end.  \n   - Use **bold text for key details**, proper paragraphs, and line breaks for readability.  \n   - Ensure the response is **mobile-friendly and email-compatible**. \n\n### **Return Format (Very Important!)**  \nReturn only a valid JSON object, without markdown, code blocks, or extra formatting.\nEnsure the response is a plain JSON object like this:\n\n{\n  \"subject\": \"<Extracted Email Subject>\",\n  \"formatted_response\": \"<Complete HTML email excluding subject>\"\n}\n\n- Do NOT wrap the JSON in triple backticks (```).\n- Do NOT return additional text or explanations.\n- Ensure `formatted_response` contains only a valid HTML string.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an AI email formatter specializing in crafting professional HTML email responses.\n\n### **Your Task:**  \n- Convert the provided text response into **a well-structured, email-friendly HTML format**.  \n- Ensure the response is **clear, visually appealing, and well-organized**.  \n- Use **proper HTML tags** like `<h1>`, `<h2>`, `<p>`, `<strong>`, and `<br>` for better readability.  \n- The email should start with a **friendly greeting**, followed by the response, and end with a **polite closing**.  \n- The **subject** should be used as the email **heading** in `<h2>` or `<h3>`.  \n- Format important details **(pricing, product names, key information) in bold**.  \n- Ensure the response is **concise, properly spaced, and mobile-friendly**.  \n\n### **Return Format (Very Important!)**  \nReturn only a valid JSON object, without markdown, code blocks, or extra formatting.\nEnsure the response is a plain JSON object like this:\n\n{\n  \"subject\": \"<Extracted Email Subject>\",\n  \"formatted_response\": \"<Complete HTML email excluding subject>\"\n}\n\n- Do NOT wrap the JSON in triple backticks (```).\n- Do NOT return additional text or explanations.\n- Ensure `formatted_response` contains only a valid HTML string.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2780,
+        -500
+      ],
+      "id": "052297d2-9c7b-4fb8-af57-8ba5a325d567",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"subject\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"response\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3000,
+        -320
+      ],
+      "id": "0016524e-a840-4523-8b85-8236ecf8d926",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1940,
+        -160
+      ],
+      "id": "31dc7f0d-5e55-48d7-b11c-5b029836833a",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "WsM8AUx3rZXQbaVh",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "emailType": "html",
+        "message": "={{ $json.output.response }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3520,
+        -480
+      ],
+      "id": "0bdad2f4-65d8-4e76-82b6-e46ea7e64e86",
+      "name": "Gmail",
+      "webhookId": "aeb3f692-531d-42fe-a493-2eb5dda74223",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a persuasive and professional email response to engage the customer when no direct answer is available in the Supabase vector store.\n\n### **Input Details:**\n- **Original Email Subject (From User):** {{ $('Gmail Trigger').item.json.Subject }}\n- **Original Email Content:** {{ $('Edit Fields1').item.json.Content }}\n- **AI Suggested Response:** {{ $json.output.response }}\n- **Name :** {{ $('Gmail Trigger').item.json.To }}\n- **Company Name :** Eco woodies\n- **Company Details:** company specializing in handcrafted furniture, bamboo products, and eco-friendly home décor. The company values sustainability, natural materials, and artisanal craftsmanship.\n\n### **Your Task:**\n1. **Acknowledge the customer's query** politely and professionally.\n2. **Provide assurance** that the team is actively looking into their request.\n3. **Keep the customer engaged** by offering helpful information related to their query.\n4. **Highlight the company’s expertise** and solutions relevant to their needs.\n5. **Encourage the customer to wait** while ensuring they feel valued.\n6. **Generate a new, appropriate email subject** based on the original subject while making it more engaging.\n\n### **Return Format (Very Important!)**\nReturn only valid JSON in the exact format below. Do NOT include extra text, explanations, or formatting.\n\n```json\n{\n  \"subject\": \"<Persuasive Email Subject>\",\n  \"formatted_response\": \"<HTML formatted email response>\"\n}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n---\n\n### **System Prompt (Guiding the AI Model)**:  \n```plaintext\nYou are a professional AI email assistant specializing in customer engagement and persuasion. Your task is to generate a convincing, well-structured, and polite response when no immediate answer is found in the company's database.\n\n### **Instructions:**\n1. **Start with a warm greeting** that acknowledges the customer's email and shows appreciation.\n2. **Reassure them that the team is working on their request** and will follow up soon.\n3. **Make the email engaging** by sharing relevant information about the company’s expertise, services, or related solutions.\n4. **Use persuasive language** to keep the customer interested while they wait for a final response.\n5. **End with a professional and friendly closing**, encouraging them to reach out if needed.\n6. **Generate a new subject line** that is:\n   - Based on the **original subject**.\n   - More engaging, relevant, and informative.\n   - If the response is a follow-up, prefix it with `\"Re: \"` while making it meaningful.\n\n### **Email Formatting:**\n- Use proper HTML tags for structure and readability.\n- Ensure the response is mobile-friendly and visually appealing.\n- Highlight important details using **bold text**.\n\n### **Output Format:**\nReturn a JSON object with:\n- **subject**: A professional, engaging subject line.\n- **formatted_response**: The complete HTML-formatted email (excluding the subject).\n\nDo NOT include extra text, explanations, or formatting outside the JSON structure.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2780,
+        -120
+      ],
+      "id": "e8be140b-7b32-4178-b0a6-8171e2fbcfa5",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"subject\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"response\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2980,
+        120
+      ],
+      "id": "6caeb659-eed4-4db3-95b7-43ce40a2b1c6",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2780,
+        140
+      ],
+      "id": "972f3c8a-eec3-4a98-8257-b8e5c4e7f4ce",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "WsM8AUx3rZXQbaVh",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "emailType": "html",
+        "message": "={{ $json.output.response }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3680,
+        -80
+      ],
+      "id": "88d50a4a-916c-4356-b6b4-c0e2f9a7718e",
+      "name": "Gmail4",
+      "webhookId": "c3fed4e7-ad6c-439d-8f1e-fcb993036ea0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following email and generate a response to request clarification while providing relevant information from the company knowledge base.\n\n**Email Subject:**  \n{{ $('Gmail Trigger').item.json.Subject }}\n\n**Email Content:**  \n{{ $('Code').item.json.cleanedContent }}\n\n**Name : **\n{{ $('Gmail Trigger').item.json.To }}\n\n**Company Name**\nEco Woodies\n**Response Requirements:**\n- First, ask the sender for clarification based on missing or vague details.\n- Retrieve the top 3 most relevant answers from the vector store and summarize them.\n- Provide a brief company introduction, emphasizing our handcrafted furniture, bamboo products, and eco-friendly home décor.\n- Ensure the email maintains a professional and engaging tone.\n- Generate a new subject line that aligns with the user’s original subject while reflecting the request for more details.\n- Format the response as **a properly structured HTML email** with headings, paragraphs, and bullet points for readability.\n\n**Output Format:**\n- **New Subject:** [Generated subject line]\n- **Response (HTML):** [Properly formatted HTML email response]\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an AI assistant for a company specializing in handcrafted furniture, bamboo products, and eco-friendly home décor. The company values sustainability, natural materials, and artisanal craftsmanship.\n\nYour task is to generate a **professional, well-structured HTML email** response when an incoming email lacks enough clarity for an immediate answer. Follow these structured steps:\n\n1️⃣ **Clarification Request**  \n   - Identify missing or unclear details from the sender’s message.  \n   - Politely ask for more specific information (e.g., \"Could you clarify the quantity you need?\" or \"Do you have any specific customization preferences?\").  \n\n2️⃣ **Retrieve Relevant Information**  \n   - Query the vector store for the top 3 most relevant answers related to the sender’s inquiry.  \n   - Summarize key points from these retrieved answers to provide useful context.  \n\n3️⃣ **Company Information**  \n   - Include a **brief introduction** about the company, emphasizing its handcrafted furniture, bamboo products, and sustainability values.  \n   - Mention related products or services based on the sender’s inquiry.  \n\n4️⃣ **Professional & Engaging Tone**  \n   - Ensure the response is warm, professional, and aligned with the company’s branding.  \n   - Use clear, concise language while maintaining a customer-friendly approach.  \n\n5️⃣ **Generate a New Subject Line**  \n   - Modify the email subject to reflect the request for more information while keeping it aligned with the original subject.  \n\n6️⃣ **Format Response in Proper HTML**  \n   - Use **<h1>, <h2>, <p>, <ul>, <li>, <strong>** for structure and readability.  \n   - Keep it visually appealing but simple for email clients.  \n\n### **Response Format (Strict JSON Only)**\nOnly return a JSON object in the following format **without extra text**:\n\n```json\n{\n  \"subject\": \"Generated subject line\",\n  \"response\": \"Generated email response in HTML\"\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1400,
+        440
+      ],
+      "id": "f691fade-6808-43f9-b112-43ef83a509de",
+      "name": "AI Agent4"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"subject\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"response\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1620,
+        660
+      ],
+      "id": "88c09c30-8f8f-4082-83dc-eb23193651ac",
+      "name": "Structured Output Parser5"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        780
+      ],
+      "id": "3575fcec-d978-40e7-8982-b9578821c673",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "WsM8AUx3rZXQbaVh",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "documents",
+        "description": "=You are an AI assistant that analyzes data retrieved from a Supabase vector store to generate accurate and relevant responses. Your goal is to extract the most appropriate information from structured data and return a well-formatted response.\n\n---\n\n### **How the Data is Retrieved:**  \n- The data comes from a Supabase vector store, storing structured objects.  \n- The key fields you will receive are:  \n  - **Content**: The original query or context related to the user’s request.  \n  - **Answer**: The predefined response corresponding to the Content.  \n  - **Metadata**: Includes additional details such as the category and blob type.  \n\n---\n\n### **Your Task:**  \n1️⃣ **Understand the Query:**  \n   - Extract the `Content` field to determine the intent of the inquiry.  \n\n2️⃣ **Verify the Answer's Relevance:**  \n   - Ensure that the `Answer` field **directly corresponds** to the provided `Content`.  \n   - If the `Answer` does **not align** with the `Content`, return a fallback response instead of providing incorrect information.  \n\n3️⃣ **Generate a Clear and Structured Response:**  \n   - Use the verified `Answer` to formulate a **concise, relevant, and professional response**.  \n   - **Do NOT generate content beyond what is provided in the `Answer` field.**  \n   - If no relevant answer is found, respond with:  \n     _\"I'm sorry, but I couldn't find the exact information you're looking for. Can you provide more details?\"_  \n\n---\n\n### **Response Formatting:**  \n- **Professional and Clear**: Maintain a structured format using proper headings, paragraphs, and bullet points.  \n- **No Fabrication**: Only return the answer if it matches the query correctly.  \n- **Fallback Handling**: If no valid match is found, provide a polite request for clarification.  \n\n---\n\n### **General Data Structure (Example)**  \n```json\n{\n  \"metadata\": {\n    \"Category\": \"Product Inquiry\",\n    \"blobType\": \"text/plain\",\n    \"Content\": \"What materials are used in your handcrafted furniture?\",\n    \"Answer\": \"Our handcrafted furniture is made from sustainably sourced bamboo, reclaimed wood, and eco-friendly materials.\"\n  }\n}\n",
+        "topK": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        820
+      ],
+      "id": "ff1f15d6-d8ab-457e-b25f-822175d7cb83",
+      "name": "Answer questions with a vector store1"
+    },
+    {
+      "parameters": {
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "id"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        1060
+      ],
+      "id": "b2dfb76d-580e-4361-9f19-13c3cf13c453",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "S06QrbXYjBduj05z",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        1220
+      ],
+      "id": "0e85aac2-a510-4cbe-873a-2ea190f3d1d3",
+      "name": "Embeddings Google Gemini2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "i4MLf1sSOtcEyggp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1-distill-llama-70b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        960
+      ],
+      "id": "3bfea9d2-96e4-4944-8f58-27273998a4f5",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "BISTjxbwZ2Pt7Swa",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "emailType": "html",
+        "message": "={{ $json.output.response }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2020,
+        520
+      ],
+      "id": "0cc63c9d-14f3-4bf4-a55a-142263420560",
+      "name": "Gmail5",
+      "webhookId": "81877d58-d08c-46c3-b5f4-899a9ea56703",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "addLabels",
+        "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "labelIds": [
+          "Label_3824456169347318965"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1240,
+        180
+      ],
+      "id": "3ea8c884-1052-478d-9a3d-b6918976a60b",
+      "name": "Gmail6",
+      "webhookId": "8d8fd346-b5ed-45ee-b1f5-e05e38a12907",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "labelIds": [
+          "Label_4660287755492001105",
+          "Label_8429852713109192205"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3200,
+        -100
+      ],
+      "id": "42f1dd86-b73c-47e4-9477-dc5a9c220cbf",
+      "name": "Gmail7",
+      "webhookId": "8d8fd346-b5ed-45ee-b1f5-e05e38a12907",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output.subject}}",
+        "emailType": "html",
+        "message": "={{ $json.output.response }}",
+        "options": {
+          "threadId": "={{ $('Gmail Trigger').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3220,
+        -480
+      ],
+      "id": "1db1f052-1dac-4dff-9ce9-fe0c075839d3",
+      "name": "Gmail8",
+      "webhookId": "961d08e8-d237-40f9-8a36-d62ce32ea44f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output.subject }}",
+        "message": "={{ $json.output.response }}",
+        "options": {
+          "threadId": "={{ $('Gmail Trigger').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3420,
+        -100
+      ],
+      "id": "b2c14771-9efa-4c36-b667-d91affc49738",
+      "name": "Gmail9",
+      "webhookId": "2e7c2d09-7ba0-4d90-8320-8671bbc83977",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.output.response }}",
+        "options": {
+          "threadId": "={{ $('Gmail Trigger').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1760,
+        440
+      ],
+      "id": "5952c283-d7a0-4dae-9fcc-9865b570ce6c",
+      "name": "Gmail10",
+      "webhookId": "9ee01a75-f39c-4e3b-afc8-0cff952a4d4b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XNxYVTeQ7HujgeX4",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Gmail3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Gmail8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Gmail7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store2": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store1",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent4": {
+      "main": [
+        [
+          {
+            "node": "Gmail10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail6": {
+      "main": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail7": {
+      "main": [
+        [
+          {
+            "node": "Gmail9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4c12a91d-05b5-4d57-ac17-79a98a985a54",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f89cca993adecb3dc50899cab478f4ee98161fd884eb9b90a358cdc37717ac28"
+  },
+  "id": "4EgbOGqBnVmQr1WZ",
+  "tags": []
+}
