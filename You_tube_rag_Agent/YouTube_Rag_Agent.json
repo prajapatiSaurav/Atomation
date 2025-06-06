@@ -1,0 +1,1163 @@
+{
+  "name": "YouTube Rag Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -900,
+        180
+      ],
+      "id": "f9b08665-0347-4e9b-b08f-f8f766e19fb3",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "apphuoB8ZuFiQsavU",
+          "mode": "list",
+          "cachedResultName": "You Tube Chat",
+          "cachedResultUrl": "https://airtable.com/apphuoB8ZuFiQsavU"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblrVChi8x37HMMt9",
+          "mode": "list",
+          "cachedResultName": "You Tube",
+          "cachedResultUrl": "https://airtable.com/apphuoB8ZuFiQsavU/tblrVChi8x37HMMt9"
+        },
+        "filterByFormula": "NOT({status}=\"done\")",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -580,
+        180
+      ],
+      "id": "af0b2acd-f8dd-4ade-aa14-7cd42af95228",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "RSOWOTzVcKjBVr6i",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "channelId",
+              "value": "={{ $json.channelId }}"
+            },
+            {
+              "name": "order",
+              "value": "viewCount"
+            },
+            {
+              "name": "maxResults",
+              "value": "50"
+            },
+            {
+              "name": "type",
+              "value": "video"
+            },
+            {
+              "name": "publishedAfter",
+              "value": "={{ new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}}"
+            },
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        580,
+        140
+      ],
+      "id": "4af0ccab-5657-4759-8b82-dfc075de1fbe",
+      "name": "get videos",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "R7tT0KerzqW1iePL",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/commentThreads",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "videoId",
+              "value": "={{ $json.videoId }}"
+            },
+            {
+              "name": "part",
+              "value": "snippet,replies"
+            },
+            {
+              "name": "maxResults",
+              "value": "100"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        580,
+        680
+      ],
+      "id": "dd5346ae-dba8-4aa3-8cc7-803031bada30",
+      "name": "get comments",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "R7tT0KerzqW1iePL",
+          "name": "YouTube account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        460,
+        1000
+      ],
+      "id": "a9def9d3-a354-452f-b2bf-6ff156e8e5d4",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "S06QrbXYjBduj05z",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $('Loop Over Items1').item.json.text }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "videoId",
+                "value": "={{ $('Loop Over Items1').item.json.videoId }}"
+              },
+              {
+                "name": "videoUrl",
+                "value": "={{ $('Loop Over Items1').item.json.videoUrl }}"
+              },
+              {
+                "name": "channelId",
+                "value": "={{ $('Loop Over Items1').item.json.channelId }}"
+              },
+              {
+                "name": "publishedAt",
+                "value": "={{ $('Loop Over Items1').item.json.publishedAt }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1340
+      ],
+      "id": "d2100a9d-d197-4d4c-8cc4-31b151e9ef3c",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 999,
+        "options": {
+          "splitCode": "markdown"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        440,
+        1520
+      ],
+      "id": "12a08e16-f3ea-413a-bb83-5c170d554f51",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "batchSize": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        120,
+        460
+      ],
+      "id": "d164c970-f9bf-46dc-8568-09bf1a70c69c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "batchSize": 100,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -140,
+        960
+      ],
+      "id": "ea364320-e047-4093-bcde-9909d0772be8",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        480
+      ],
+      "id": "7b711c5b-d8f7-411d-90a9-56f88a217c41",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "10a8bb66-dec9-4da5-8912-0dcd18504dde",
+              "name": "videoId",
+              "value": "={{ $json.snippet.topLevelComment.snippet.videoId }}",
+              "type": "string"
+            },
+            {
+              "id": "1de0133a-2150-4665-8086-54ad0e2a6b61",
+              "name": "text",
+              "value": "={{ $json.snippet.topLevelComment.snippet.textDisplay }}",
+              "type": "string"
+            },
+            {
+              "id": "71f6584b-4b7e-4046-a65f-6ac92c4ed851",
+              "name": "videoUrl",
+              "value": "=https://www.youtube.com/watch?v={{ $json.snippet.topLevelComment.snippet.videoId }}",
+              "type": "string"
+            },
+            {
+              "id": "f0313a5f-c3f6-40da-8a14-ac564359ee5d",
+              "name": "channelId",
+              "value": "={{ $json.snippet.channelId }}",
+              "type": "string"
+            },
+            {
+              "id": "0dd00859-46d4-4227-9c40-aecf48eb3d63",
+              "name": "publishedAt",
+              "value": "={{ $json.snippet.topLevelComment.snippet.publishedAt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        440
+      ],
+      "id": "7d50b6a6-f25f-4542-bf39-3609642b3894",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6abe77c-a9be-45f7-95ca-52ebc73f0ddf",
+              "name": "channelId",
+              "value": "={{ $json.items[0].id.channelId }}",
+              "type": "string"
+            },
+            {
+              "id": "aa7bd863-af96-4f7c-8bec-873cb1f1b8ee",
+              "name": "channelName",
+              "value": "={{ $json.items[0].snippet.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        160
+      ],
+      "id": "200f4b94-8b96-470f-9a6b-021db9cc76bd",
+      "name": "channel id and name"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a3dd9a2-f7d6-4cc7-994d-2a9cc6660dba",
+              "name": "title",
+              "value": "={{ $json.snippet.title }}",
+              "type": "string"
+            },
+            {
+              "id": "60e0272a-4143-45e0-bcc5-77f7646041d8",
+              "name": "channel",
+              "value": "={{ $json.snippet.channelTitle }}",
+              "type": "string"
+            },
+            {
+              "id": "10cd378a-2792-4766-875d-561bfa3b12e3",
+              "name": "description",
+              "value": "={{ $json.snippet.description }}",
+              "type": "string"
+            },
+            {
+              "id": "f88760f3-a011-4706-8e8c-435776842ed7",
+              "name": "videoId",
+              "value": "={{ $json.id.videoId }}",
+              "type": "string"
+            },
+            {
+              "id": "e245bb34-aaf4-4a6c-b54c-19f2c9cd7b87",
+              "name": "videoUrl",
+              "value": "=https://www.youtube.com/watch?v={{ $json.id.videoId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -380,
+        480
+      ],
+      "id": "cc67d7b2-ffd9-482a-a00c-a726d999086c",
+      "name": "video fields"
+    },
+    {
+      "parameters": {
+        "content": "## Getting the videos for the selected channels",
+        "height": 320,
+        "width": 1520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -700,
+        80
+      ],
+      "id": "0f0318e9-8292-44e6-ab71-ce6cae37c24b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "apphuoB8ZuFiQsavU",
+          "mode": "list",
+          "cachedResultName": "You Tube Chat",
+          "cachedResultUrl": "https://airtable.com/apphuoB8ZuFiQsavU"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblrVChi8x37HMMt9",
+          "mode": "list",
+          "cachedResultName": "You Tube",
+          "cachedResultUrl": "https://airtable.com/apphuoB8ZuFiQsavU/tblrVChi8x37HMMt9"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Yes",
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Channel",
+              "displayName": "Channel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "No",
+                  "value": "No"
+                },
+                {
+                  "name": "Yes",
+                  "value": "Yes"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -220,
+        -100
+      ],
+      "id": "6641c432-d360-4e67-85bb-ff65822f962a",
+      "name": "Update done records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "RSOWOTzVcKjBVr6i",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Getting the comments from the videos",
+        "height": 500,
+        "width": 1220,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        420
+      ],
+      "id": "a53c1bcb-ad66-4413-b777-5b2433aa90a3",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "343a7c07-52df-4b26-8c8e-8dd8413a09a5",
+              "leftValue": "={{ $json.channelId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        300,
+        160
+      ],
+      "id": "45a3a1eb-739d-4f83-9b56-5fc0489265db",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "04b8a7f5-7957-441c-aac8-b82afdc8273b",
+              "name": "Channel",
+              "value": "={{ $json.Channel.split(\"@\")[1]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -360,
+        180
+      ],
+      "id": "c35cef5c-97e2-4fb1-9177-4cef79edabe8",
+      "name": "get username"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.Channel }}"
+            },
+            {
+              "name": "type",
+              "value": "channel"
+            },
+            {
+              "name": "maxresults",
+              "value": "1"
+            },
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -200,
+        180
+      ],
+      "id": "f0aab2b4-f3ca-4e85-903e-61465ada7489",
+      "name": "get channel id from username",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "R7tT0KerzqW1iePL",
+          "name": "YouTube account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        420,
+        440
+      ],
+      "id": "1089003a-a2cd-4ab3-a385-74fea7d28cc8",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1e487654-9d7a-485b-a48b-812b2d44c544",
+              "leftValue": "={{ $json.videoId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        480
+      ],
+      "id": "6acf33f3-91a5-4f1f-a83d-39c41ded1ef9",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "batchSize": 100,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        200,
+        980
+      ],
+      "id": "6fe7d2d9-1f60-45a9-bab2-6f77509007c2",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        300,
+        1300
+      ],
+      "id": "af7930e5-e3ab-4d0c-bca9-5b0a68632ebb",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "i4MLf1sSOtcEyggp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1260,
+        300
+      ],
+      "id": "d18d9a84-194d-4aae-9d86-995e7cd259f0",
+      "name": "When chat message received",
+      "webhookId": "0fa99fe8-ca8d-4008-b3a4-17b5e15454d4"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "SYSTEM CONTEXT:\nYou are a YouTube content strategist with access to a vector database of YouTube comments through the Vector Store Tool. Your role is to analyze viewer engagement, identify content opportunities, and help creators develop targeted content based on audience interests and trends.\n\nANALYSIS CAPABILITIES:\n\n1. TREND ANALYSIS\n- Identify emerging topics and themes\n- Track audience interests and questions\n- Analyze sentiment patterns\n- Spot content gaps and opportunities\n- Monitor engagement triggers\n- Recognize recurring viewer requests\n\n2. CONTENT DEVELOPMENT\n- Transform viewer interests into content ideas\n- Create scripts based on audience needs\n- Design titles that drive engagement\n- Structure content for maximum impact\n- Suggest hooks based on viewer feedback\n\n3. AUDIENCE INSIGHTS\n- Extract viewer pain points and needs\n- Identify demographic patterns\n- Map content preferences\n- Track evolving viewer interests\n\nRESPONSE FORMATS:\n\n1. For Trend Analysis:\nTREND REPORT\nKey Patterns:\n[Major trends with comment evidence]\nEmerging Topics:\n[New and growing themes]\nAudience Sentiment:\n[Viewer reactions and engagement patterns]\nContent Gaps:\n[Underserved topics and requests]\n\n2. For Content Creation:\nCONTENT PROPOSAL\nTitle: [Engaging, SEO-optimized title]\nTarget Audience: [Viewer demographic]\nKey Hook: [Compelling opening]\nScript Structure:\n\nIntroduction: [Attention-grabbing opener]\nMain Content: [Key points and flow]\nEngagement Elements: [Interactive moments]\nConclusion: [Call to action]\n\nSupporting Evidence:\n[Relevant viewer comments]\n[Engagement patterns]\n\nWORKING PROCESS:\n1. Query Vector Store Tool for relevant comments\n2. Analyze patterns and viewer needs\n3. Identify content opportunities\n4. Develop targeted content ideas\n5. Support with comment evidence\n\nOUTPUT PRINCIPLES:\n- Base all insights on actual comment data\n- Include specific viewer quotes\n- Reference video performance data\n- Focus on actionable content ideas\n- Connect trends to viewer needs\n- Suggest practical content solutions\n- output formatted text, never markdown\n\nRemember to:\n- Always query Vector Store Tool first\n- Use comment evidence for recommendations\n- Focus on viewer-driven insights\n- Consider engagement metrics\n- Reference source videos when relevant\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1520,
+        300
+      ],
+      "id": "0fb3a333-7686-4ed4-bbad-bc29f16ed671",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "name": "documents",
+        "description": "Containing the data about you tube comments",
+        "topK": 25
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        520
+      ],
+      "id": "75382d80-1182-4be8-b5cb-62defc6f35a6",
+      "name": "Vector Store Tool"
+    },
+    {
+      "parameters": {
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        780
+      ],
+      "id": "53dfc6b5-75a9-40da-8265-b76d1006bd90",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "S06QrbXYjBduj05z",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        540
+      ],
+      "id": "9a2b7931-4415-4470-a88e-1b77a770383a",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "BISTjxbwZ2Pt7Swa",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        740
+      ],
+      "id": "6e4c749f-65a2-4439-8021-115fa37a3687",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "BISTjxbwZ2Pt7Swa",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        1000
+      ],
+      "id": "353e946f-7aa3-4e37-9e24-58cd81d73205",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "i4MLf1sSOtcEyggp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1560,
+        520
+      ],
+      "id": "9cc696f7-7491-4a6e-8e1f-7fae9c046f72",
+      "name": "Window Buffer Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "get username",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update done records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get videos": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get comments": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "main": [
+        []
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "video fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "channel id and name": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "video fields": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "get videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get username": {
+      "main": [
+        [
+          {
+            "node": "get channel id from username",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get channel id from username": {
+      "main": [
+        [
+          {
+            "node": "channel id and name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a33bbb28-53f5-4627-8083-bb22133295be",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f89cca993adecb3dc50899cab478f4ee98161fd884eb9b90a358cdc37717ac28"
+  },
+  "id": "C1XvLflBQFmEl2Xk",
+  "tags": [
+    {
+      "createdAt": "2025-02-05T12:26:00.438Z",
+      "updatedAt": "2025-02-05T12:26:00.438Z",
+      "id": "4mX59jt3y8gViUA4",
+      "name": "youtube comments agent"
+    },
+    {
+      "createdAt": "2025-02-05T12:26:00.939Z",
+      "updatedAt": "2025-02-05T12:26:00.939Z",
+      "id": "UOAeoCGBMsJn5Gtb",
+      "name": "RAG"
+    }
+  ]
+}
